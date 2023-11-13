@@ -12,21 +12,25 @@ class TestProc(TestCase):
         h = Proc(lambda a, b: [a,b])
         v = Proc(lambda *a: reduce(add, a, 0))
         self.assertEqual(n := f(2), 4, f"4 expected, got: {n}")
-        self.assertEqual(n := g(3), 6, f"3 expected, got: {n}")
+        self.assertEqual(n := g(3), 6, f"6 expected, got: {n}")
         self.assertEqual(a := h(1, 2), [1,2], f"[1,2] expected, got: {a}")
         self.assertEqual(n := v(1, 2, 3), 6, f"6 expected, got: {n}")
         with self.assertRaises(TypeError):
             h(1, 2, 3) # too many arguments
 
     def test_proc_arity(self):
-        f = Proc(lambda: None)
-        g = Proc(lambda x: x + x)
-        h = Proc(lambda a, b: [a,b])
-        v = Proc(lambda *a: a)
+        f = Proc(lambda: None)              # 0 parameters
+        g = Proc(lambda x: x + x)           # 1 positional parameter
+        h = Proc(lambda a, b: [a,b])        # 2 positional parameters
+        v = Proc(lambda *a: a)              # 1 variable positional parameter
+        w = Proc(lambda x, *a, y=0: x + y)  # y is a keyword-only parameter
+        z = Proc(lambda x, y=0, **d: x + y) # y is a keyword/positional parameter
         self.assertEqual(n := f.arity, 0, f"0 expected, got: {n}")
         self.assertEqual(n := g.arity, 1, f"1 expected, got: {n}")
         self.assertEqual(n := h.arity, 2, f"2 expected, got: {n}")
         self.assertEqual(n := v.arity, 1, f"1 expected, got: {n}")
+        self.assertEqual(n := w.arity, 2, f"2 expected, got: {n}")
+        self.assertEqual(n := z.arity, 2, f"2 expected, got: {n}")
 
     def test_curried_proc_is_variadic(self):
         b = Proc(lambda x, y, z: x + y + z)
