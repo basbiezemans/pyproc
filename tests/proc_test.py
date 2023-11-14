@@ -35,8 +35,8 @@ class TestProc(TestCase):
     def test_curried_proc_is_variadic(self):
         b = Proc(lambda x, y, z: x + y + z)
         v = Proc(lambda *a: a)
-        self.assertTrue(v.curry(None).is_variadic)
-        self.assertFalse(b.curry(None).is_variadic)
+        self.assertTrue(v.curry().is_variadic)
+        self.assertFalse(b.curry().is_variadic)
 
     def test_curried_proc(self):
         b = Proc(lambda x, y, z: x + y + z)
@@ -61,13 +61,19 @@ class TestProc(TestCase):
     def test_variadic_curried_proc(self):
         b = Proc(lambda x, y, z, *w: x + y + z + reduce(add, w, 0))
         v = Proc(lambda *a: a)
-        self.assertEqual(t := v.curry(1)(), (1,), f"(1,) expected, got: {t}")
-        self.assertEqual(t := v.curry()(1)(2)(), (1,2), f"(1,2) expected, got: {t}")
-        self.assertEqual(t := v.curry(1)(2)(3)(), (1,2,3), f"(1,2,3) expected, got: {t}")
-        self.assertEqual(n := b.curry(1)(2)(3)(), 6, f"6 expected, got: {n}")
-        self.assertEqual(n := b.curry(1, 2)(3, 4)(), 10, f"10 expected, got: {n}")
-        self.assertEqual(n := b.curry(1)(2)(3)(4)(5)(), 15, f"15 expected, got: {n}")
-        self.assertEqual(n := b.curry(1, 2)(3, 4)(5)(), 15, f"15 expected, got: {n}")
+        self.assertEqual(t := v.curry(1).call(), (1,), f"(1,) expected, got: {t}")
+        self.assertEqual(t := v.curry()(1)(2).call(), (1,2), f"(1,2) expected, got: {t}")
+        self.assertEqual(t := v.curry(1)(2).call(3), (1,2,3), f"(1,2,3) expected, got: {t}")
+        self.assertEqual(n := b.curry(1)(2)(3).call(), 6, f"6 expected, got: {n}")
+        self.assertEqual(n := b.curry(1, 2).call(3, 4), 10, f"10 expected, got: {n}")
+        self.assertEqual(n := b.curry(1)(2)(3)(4).call(5), 15, f"15 expected, got: {n}")
+        self.assertEqual(n := b.curry(1, 2)(3, 4).call(5), 15, f"15 expected, got: {n}")
+        flip = lambda func: lambda *args: func(*reversed(args))
+        split = Proc(flip(str.split))
+        words = split.curry(' ')
+        qbfox = "the quick brown fox jumps over the lazy dog"
+        want = ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']
+        self.assertEqual(have := words.call(qbfox), want, f"{want} expected, got: {have}")
 
     def test_proc_composition(self):
         f = Proc(lambda x: x * x)

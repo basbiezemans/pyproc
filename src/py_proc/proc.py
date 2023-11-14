@@ -68,16 +68,15 @@ class VCurriedProc(Proc):
     def curry(self, *args):
         return VCurriedProc(self.callback, *args)
 
-    # Currying a variadic function is different from currying functions with fixed
-    # arity, especially with respect to how termination is achieved by passing an
-    # empty argument. Without termination, it can take infinite number of arguments.
+    def __call__(self, *args):
+        "Return a curried proc with updated arguments."
+        self.argv += args
+        return self
+
     def call(self, *args):
-        "Return a curried proc or invoke the callback."
-        if len(args) == 0:
-            return self.callback(*self.argv)
-        else:
-            self.argv += args
-            return self
+        "Invoke the callback and return its result."
+        self.argv += args
+        return self.callback(*self.argv)
 
 
 def min_num_args(sig):
