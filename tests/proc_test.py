@@ -49,8 +49,13 @@ class TestProc(TestCase):
 
     def test_double_curried_proc(self):
         b = Proc(lambda x, y, z: x + y + z)
-        c = b.curry(1).curry(2,3) # creates 2 curried versions of b
-        self.assertEqual(n := c.call(4), 9, f"9 expected, got: {n}")
+        c = b.curry(1)
+        self.assertTrue(isinstance(c.curry(2), Proc))
+        self.assertEqual(n := c.curry(2,3), 6, f"6 expected, got: {n}")
+        v = Proc(lambda *a: reduce(add, a, 0))
+        p = v.curry(1)
+        self.assertTrue(isinstance(p.curry(2,3), Proc))
+        self.assertEqual(n := p.curry(2,3).call(), 6, f"6 expected, got: {n}")
 
     def test_curried_proc_composition(self):
         proc = Proc(lambda x, y, z: x + y + z)

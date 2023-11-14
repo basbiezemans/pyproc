@@ -47,7 +47,7 @@ class FCurriedProc(Proc):
         self.argv = args
 
     def curry(self, *args):
-        return FCurriedProc(self.callback, *args)
+        return FCurriedProc(self.callback, *self.argv).call(*args)
 
     def call(self, *args):
         "Return a curried proc or invoke the callback."
@@ -66,7 +66,7 @@ class VCurriedProc(Proc):
         self.argv = args
 
     def curry(self, *args):
-        return VCurriedProc(self.callback, *args)
+        return VCurriedProc(self.callback, *(self.argv + args))
 
     def __call__(self, *args):
         "Return a curried proc with updated arguments."
