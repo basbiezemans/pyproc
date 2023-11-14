@@ -2,7 +2,7 @@ from unittest import TestCase
 from operator import add
 from functools import reduce
 
-from src.proc import Proc
+from src.py_proc.proc import Proc
 
 class TestProc(TestCase):
 
